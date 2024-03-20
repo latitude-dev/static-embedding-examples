@@ -1,11 +1,17 @@
 import { createRoute } from 'honox/factory'
+import { getCookie } from 'hono/cookie'
+import { Context } from 'hono'
+import Header from '../components/Header'
 
-export default createRoute((c) => {
-  const name = c.req.query('name') ?? 'Hono'
+export default createRoute((c: Context) => {
+  const session = getCookie(c, 'session')
+
+  if (!session) return c.redirect('/login')
+
   return c.render(
-    <div>
-      <h1>Hello, {name}!</h1>
-    </div>,
-    { title: name }
+    <>
+      <Header isLogin/>
+      <h1>Hello World</h1>
+    </>
   )
 })
