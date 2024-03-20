@@ -30,7 +30,6 @@ export function handleSessionRedirect({
   const edit = context.req.query('edit') === "1"
   const path = context.req.path
   const isEditing = edit && path === RedirectPath.credentials
-  console.log("IS_EDIdTING", isEditing)
 
   if (!session) {
     return '/login'
