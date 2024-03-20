@@ -1,17 +1,21 @@
 import { createRoute } from 'honox/factory'
-import { getCookie } from 'hono/cookie'
 import { Context } from 'hono'
 import Header from '../components/Header'
+import { getLatitudeCredentials, handleSessionRedirect } from '../lib/handleSessionRedirect'
 
 export default createRoute((c: Context) => {
-  const session = getCookie(c, 'session')
+  const redirect = handleSessionRedirect({ context: c, redirectIfOk: false })
+  if (redirect) return c.redirect(redirect)
 
-  if (!session) return c.redirect('/login')
+  const { siteUrl, secretKey } = getLatitudeCredentials(c)
 
   return c.render(
     <>
       <Header isLogin />
-      <h1>Hello World</h1>
+      <h1>Data</h1>
+      Site URL: {siteUrl}
+      <br />
+      Secret Key: {secretKey}
     </>,
   )
 })

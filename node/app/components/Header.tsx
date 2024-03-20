@@ -1,3 +1,4 @@
+import { RedirectPath } from '../lib/handleSessionRedirect'
 import Button from './Button'
 
 export default function Header({ isLogin }: { isLogin: boolean }) {
@@ -12,9 +13,14 @@ export default function Header({ isLogin }: { isLogin: boolean }) {
         />
       </a>
       {isLogin && (
-        <form action='/logout' method='POST'>
-          <Button type='submit'>Logout</Button>
-        </form>
+        <div class='flex gap-x-3 items-center'>
+          <a href={`${RedirectPath.credentials}?edit=1`} class='text-blue-500 underline'>
+            Edit credentials
+          </a>
+          <form action='/logout' method='POST'>
+            <Button type='submit'>Logout</Button>
+          </form>
+        </div>
       )}
     </header>
   )
