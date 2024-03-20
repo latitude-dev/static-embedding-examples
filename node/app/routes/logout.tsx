@@ -5,4 +5,3 @@ export const POST = createRoute(async (c) => {
   deleteCookie(c, 'session')
   return c.redirect('/login')
 })
-

@@ -10,8 +10,8 @@ export default createRoute((c: Context) => {
 
   return c.render(
     <>
-      <Header isLogin/>
+      <Header isLogin />
       <h1>Hello World</h1>
-    </>
+    </>,
   )
 })
