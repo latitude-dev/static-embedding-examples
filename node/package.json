@@ -11,7 +11,8 @@
   "private": true,
   "dependencies": {
     "hono": "^4.1.3",
-    "honox": "^0.1.9"
+    "honox": "^0.1.9",
+    "jose": "^5.2.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240208.0",
