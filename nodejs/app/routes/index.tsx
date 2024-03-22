@@ -5,7 +5,7 @@ import {
   getLatitudeCredentials,
   handleSessionRedirect,
 } from '../lib/handleSessionRedirect'
-import { signJwt, verifyJWT } from '../lib/jwt'
+import { signJwt, verifyJWT } from '@latitude-data/jwt'
 
 
 export default createRoute(async (c: Context) => {
