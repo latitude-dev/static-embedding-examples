@@ -10,37 +10,44 @@ import LatitudeIframe from '../islands/LatitudeIframe'
 
 function InfoItem({ label, children }: { label: string; children: string }) {
   return (
-    <li>
+    <div>
       <span class='font-semibold'>{label}</span>:
-      <div className="font-mono max-w-full truncate text-sm text-gray-600">{children}</div>
-    </li>
+      <div className='font-mono max-w-full truncate text-sm text-gray-600'>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function InfoWrapper({ children }: { children: JSX.IntrinsicElements['div'] }) {
+  return (
+    <div class='bg-blue-50 border border-blue-100 p-4 rounded-lg flex flex-col gap-y-4'>
+      {children}
+    </div>
   )
 }
 
 function InfoBox({
   siteUrl,
   masterKey,
-  token,
   tokenData,
 }: {
   siteUrl: string
   masterKey: string
-  token: string
   tokenData: ValidTokenResponse
 }) {
   return (
-    <div class='bg-blue-50 border border-blue-100 p-4 rounded-lg flex flex-col gap-y-4'>
-      <h1 class='text-xl font-medium'>Info</h1>
-      <ul class='flex flex-col gap-y-2'>
+    <InfoWrapper>
+      <h1 class='text-xl font-medium'>Credentials</h1>
+      <div class='flex flex-col gap-y-2'>
         <InfoItem label='Latitude Data URL' children={siteUrl} />
         <InfoItem label='Master Key' children={masterKey} />
-        <InfoItem label='Token' children={token} />
         <InfoItem
           label='Signed params'
           children={JSON.stringify(tokenData.payload)}
         />
-      </ul>
-    </div>
+      </div>
+    </InfoWrapper>
   )
 }
 
@@ -69,9 +76,11 @@ export default createRoute(async (c: Context) => {
         <InfoBox
           siteUrl={siteUrl!}
           masterKey={masterKey}
-          token={token}
           tokenData={tokenResolved}
         />
+        <InfoWrapper>
+          <InfoItem label='Generated [TOKEN]' children={token} />
+        </InfoWrapper>
         <LatitudeIframe siteUrl={siteUrl!} token={token} />
       </div>
     </>,
