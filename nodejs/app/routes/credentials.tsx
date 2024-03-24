@@ -7,23 +7,42 @@ import {
   getLatitudeCredentials,
   handleSessionRedirect,
 } from '../lib/handleSessionRedirect'
+import Input from '../components/Input'
+import Button from '../components/Button'
+import SignedParams from '../islands/SignedParams'
 
 export const POST = createRoute(async (c) => {
   const session = getCookie(c, 'session')
-  if (!session) {
-    return c.redirect('/login')
-  }
-  const { site_url, secret_master_key } = await c.req.parseBody<{
+
+  if (!session) return c.redirect('/login')
+
+  const formData = await c.req.parseBody<{
     site_url: string
     secret_master_key: string
+    'signed_keys[]': string[]
+    'signed_values[]': string[]
   }>()
+  const siteUrl = formData[SessionKey.siteUrl]
+  const masterKey = formData[SessionKey.secretMaster]
+  const keyParam = formData['signed_keys[]'] || []
+  const valueParam = formData['signed_values[]']
+  const keys = Array.isArray(keyParam) ? keyParam : [keyParam]
+  const values = Array.isArray(valueParam) ? valueParam : [valueParam]
+  const signedParams = keys.reduce(
+    (obj, key, index) => {
+      obj[key] = values[index]
+      return obj
+    },
+    {} as Record<string, string>,
+  )
 
-  if (!site_url || !secret_master_key) {
+  if (!siteUrl || !masterKey) {
     return c.redirect('/credentials?error=1')
   }
 
-  setCookie(c, 'site_url', site_url)
-  setCookie(c, 'secret_master_key', secret_master_key)
+  setCookie(c, SessionKey.siteUrl, siteUrl)
+  setCookie(c, SessionKey.secretMaster, masterKey)
+  setCookie(c, SessionKey.SignedParams, JSON.stringify(signedParams))
 
   return c.redirect('/')
 })
@@ -37,13 +56,13 @@ export default createRoute((c) => {
     return c.redirect(redirect)
   }
 
-  const { siteUrl, secretKey } = getLatitudeCredentials(c)
+  const { siteUrl, secretKey, signedParams } = getLatitudeCredentials(c)
 
   return c.render(
     <>
       <Header isLogin />
       <div class='flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0'>
-        <div class='w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700'>
+        <div class='w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-3xl xl:p-0 dark:bg-gray-800 dark:border-gray-700'>
           <div class='p-6 space-y-4 md:space-y-6 sm:p-8'>
             <h1 class='text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white'>
               Set your Latitude credentials
@@ -55,47 +74,25 @@ export default createRoute((c) => {
                 </p>
               </div>
             )}
-            <form class='space-y-4 md:space-y-6' method='POST'>
+            <form class='space-y-6' method='POST'>
+              <Input
+                required
+                name={SessionKey.siteUrl}
+                label='Site URL'
+                value={siteUrl}
+                placeholder='Ex.: http://localhost:3000'
+              />
+              <Input
+                required
+                name={SessionKey.secretMaster}
+                label='Site URL'
+                value={secretKey}
+                placeholder='Put your LATITUDE_MASTER_KEY'
+              />
               <div>
-                <label
-                  for={SessionKey.siteUrl}
-                  class='block mb-2 text-sm font-medium text-gray-900 dark:text-white'
-                >
-                  Site URL
-                </label>
-                <input
-                  type='text'
-                  name={SessionKey.siteUrl}
-                  id={SessionKey.siteUrl}
-                  class='bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                  placeholder='Ex.: http://localhost:3000'
-                  value={siteUrl}
-                  required
-                />
+                <SignedParams signedParams={signedParams} />
               </div>
-              <div>
-                <label
-                  for={SessionKey.secretMaster}
-                  class='block mb-2 text-sm font-medium text-gray-900 dark:text-white'
-                >
-                  Secret Master Key
-                </label>
-                <input
-                  type='text'
-                  name={SessionKey.secretMaster}
-                  id={SessionKey.secretMaster}
-                  placeholder='Put here your LATITUDE_MASTER_KEY found in .env file'
-                  class='bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                  required
-                  value={secretKey}
-                />
-              </div>
-              <button
-                type='submit'
-                class='w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-primary-800'
-              >
-                Store credentials
-              </button>
+              <Button type='submit'>Store credentials</Button>
             </form>
           </div>
         </div>

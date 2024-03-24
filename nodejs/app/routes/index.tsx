@@ -55,17 +55,14 @@ export default createRoute(async (c: Context) => {
   const redirect = handleSessionRedirect({ context: c, redirectIfOk: false })
   if (redirect) return c.redirect(redirect)
 
-  const { siteUrl, secretKey } = getLatitudeCredentials(c)
+  const { siteUrl, secretKey, signedParams } = getLatitudeCredentials(c)
 
   const masterKey = secretKey!
-  const token = await signJwt({
-    payload: { workspace_id: 1 },
-    secretKey: masterKey,
-  })
+  const token = await signJwt({ secretKey: masterKey, payload: signedParams  })
 
   if (token instanceof Error) return c.render(token.message)
 
-  const tokenResolved = await verifyJWT({ secretKey: secretKey!, token })
+  const tokenResolved = await verifyJWT({ secretKey: masterKey, token })
 
   if (tokenResolved instanceof Error) return c.render(tokenResolved.message)
 
