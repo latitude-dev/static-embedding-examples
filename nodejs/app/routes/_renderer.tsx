@@ -1,5 +1,4 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
-import { HasIslands } from 'honox/server'
 import { Script } from 'honox/server'
 
 export default jsxRenderer(({ children, title }) => {
@@ -12,18 +11,11 @@ export default jsxRenderer(({ children, title }) => {
         <link rel='icon' type='image/x-icon' href='/favicon.ico' />
 
         {import.meta.env.PROD ? (
-          <HasIslands>
-            <script type='module' src='/static/client.js'></script>
-          </HasIslands>
+          <link href='/static/assets/styles.css' rel='stylesheet' />
         ) : (
-          <script type='module' src='/app/client.ts'></script>
+          <link href='/app/styles.css' rel='stylesheet' />
         )}
-
-        {import.meta.env.PROD ? (
-          <link href='/static/assets/style.css' rel='stylesheet' />
-        ) : (
-          <link href='/app/style.css' rel='stylesheet' />
-        )}
+        <Script src='/app/client.ts' />
       </head>
       <body class='bg-gray-50 dark:bg-gray-900 container mx-auto gap-y-4 p-6'>
         <main>{children}</main>

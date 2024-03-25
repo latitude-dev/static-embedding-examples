@@ -10,7 +10,6 @@ export default function LatitudeIframe({
 }) {
   const [usingToken, setUseToken] = useState(false)
   const url = usingToken ? `${siteUrl}?__token=${token}` : siteUrl
-  const previewUrl = usingToken ? `${siteUrl}?__token=[TOKEN]` : siteUrl
   return (
     <div class='flex flex-col gap-y-3'>
       <div class='flex mb-2'>
@@ -19,7 +18,7 @@ export default function LatitudeIframe({
         </Button>
       </div>
       <pre class='bg-white p-4 rounded-lg shadow'>
-        <code class='text-blue-500 font-mono text-ms'>{`<iframe src=${previewUrl} />`}</code>
+        <code class='text-blue-500 font-mono text-ms'>{`<iframe src=${url} />`}</code>
       </pre>
       <iframe
         src={url}
